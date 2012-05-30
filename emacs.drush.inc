@@ -15,7 +15,7 @@ function emacs_drush_command() {
   $items = array();
 
   $items['etags'] = array(
-    'description' => dt('Make/update Emacs TAGS file'),
+    'description' => dt('Make/update Emacs TAGS file.'),
     'bootstrap' => DRUSH_BOOTSTRAP_DRUPAL_ROOT,
     'examples' => array(
       'drush etags' => dt('Make/update an Emacs TAGS file in DRUPAL_ROOT.'),
@@ -27,7 +27,7 @@ function emacs_drush_command() {
     ),
   );
   $items['gtags'] = array(
-    'description' => dt('Make/update GNU GLOBAL files'),
+    'description' => dt('Make/update GNU GLOBAL files.'),
     'bootstrap' => DRUSH_BOOTSTRAP_DRUPAL_ROOT,
     'examples' => array(
       'drush gtags' => dt('Make/update GNU GLOBAL files in DRUPAL_ROOT.'),

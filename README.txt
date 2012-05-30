@@ -24,9 +24,10 @@ and you have to remember to do that from your `DRUPAL_ROOT`.
 
 With gtags there are other caveats. A default installation will
 recognize .php (and .php3 and .phtml) as PHP files but not .module
-etc. And due to some bug/limitation in gtags, gtags will fail on
-parsing modules/system/system.api.php in Drupal 7
-(core/modules/system/system.api.php in Drupal 8).
+etc. And due to some
+[bug/limitation](http://permalink.gmane.org/gmane.comp.gnu.global.bugs/1439)
+in gtags, gtags will fail on parsing modules/system/system.api.php in
+Drupal 7 (core/modules/system/system.api.php in Drupal 8).
 
 `drush gtags` will run gtags with a configuration suitable for
 generating tag files for Drupal (as well as skip
@@ -80,13 +81,18 @@ pm-download` will keep the tag files up to date after each download.
 ## Dependencies ##
 For `drush etags`:
 
- * `etags` - part of your Emacs installation
- * `find` - part of a standard Unix system (including Mac OS X)
+ * `etags` - part of your Emacs installation.
+ * `find` - part of a standard Unix system (including Mac OS X).
 
 For `drush gtags`:
 
- * `gtags` - part of your GNU GLOBAL installation
+ * `gtags` - part of your GNU GLOBAL installation. I have tested successfully with version 6.2.
 
+Although the release is named 7.x-1.x it will also work with Drupal 6
+and Drupal 8 - but I don't think there is a better way to name a
+release for a Drush project?
+
+Tested with Drush 5.3 and Drush 4.5.
 
 ## I think it's rude to run your script after drush pm-download!!§! ##
 

@@ -1,0 +1,6 @@
+drupal8:\
+	:langmap=php\:.php.module.inc.profile.install:skip=/core/modules/system/system.api.php,tags,TAGS,.git
+drupal7:\
+	:langmap=php\:.php.module.inc.profile.install:skip=/modules/system/system.api.php,tags,TAGS,.git
+drupal6:\
+	:langmap=php\:.php.module.inc.profile.install:skip=tags,TAGS,.git

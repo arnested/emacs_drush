@@ -6,6 +6,7 @@
  */
 
 define('DRUSH_EMACS_ETAGS_EXTENSIONS', 'module,inc,php,profile,install');
+define('DRUSH_EMACS_GTAGS_GTAGSCONF', dirname(__FILE__) . '/globalrc');
 
 /**
  * Implements hook_drush_command().
@@ -34,6 +35,8 @@ function emacs_drush_command() {
     'options' => array(
       'emacs-gtags-gtags-program' => dt('Name of the gtags executable. Include path if it cannot be found in $PATH.'),
       'emacs-gtags-gtags-options' => dt('Options to add to gtags. Defaults to none.'),
+      'emacs-gtags-gtagsconf' => dt('Gtags configuration file to use. Defaults to "@gtagsconf". Use "0" for gtags default configuration.', array('@gtagsconf' => DRUSH_EMACS_GTAGS_GTAGSCONF)),
+      'emacs-gtags-gtagslabel' => dt('Gtags label to use. Defaults to "drupalX" where X is your Drupal major version number. Use "0" for gtags default label.'),
     ),
   );
 
@@ -67,14 +70,28 @@ function drush_emacs_etags() {
  */
 function drush_emacs_gtags() {
   $gtags = drush_get_option('emacs-gtags-gtags-program', 'gtags');
-  $options = drush_get_option('emacs-gtags-gtags-options', '');
+  $options = drush_get_option('emacs-gtags-gtags-options', FALSE);
 
-  $gtags_command = rtrim("$gtags $options");
+  $gtagsconf = drush_get_option('emacs-gtags-gtagsconf', DRUSH_EMACS_GTAGS_GTAGSCONF);
+  $gtagslabel = drush_get_option('emacs-gtags-gtagslabel', 'drupal' . drush_drupal_major_version());
+
+  $gtags_command = array();
+  $gtags_command[] = $gtags;
+  if ($gtagsconf != FALSE) {
+    $gtags_command[] = " --gtagsconf=$gtagsconf";
+  }
+  if ($gtagslabel != FALSE) {
+    $gtags_command[] = " --gtagslabel=$gtagslabel";
+  }
+  if ($options != FALSE) {
+    $gtags_command[] = " $options";
+  }
 
   chdir(drush_locate_root());
 
   drush_log('Creating/updating GNU GLOBAL files...');
-  system($gtags_command, $return);
+
+  system(trim(implode(' ', $gtags_command)), $return);
 
   if ($return) {
     return drush_set_error('DRUSH_EMACS', dt('Problem executing "@command".', array('@command' => $gtags_command)));

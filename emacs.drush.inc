@@ -116,10 +116,38 @@ function drush_emacs_gtags() {
  * in your drushrc.php or in your @site-alias.
  */
 function emacs_drush_pm_post_download($project, $release) {
-  if (drush_get_option('emacs-pm-post-download-etags', TRUE) && file_exists(drush_locate_root() . "/TAGS")) {
-    drush_emacs_etags();
-  }
-  if (drush_get_option('emacs-pm-post-download-gtags', TRUE) && file_exists(drush_locate_root() . "/GTAGS")) {
-    drush_emacs_gtags();
+  global $_emacs_drush_update_tags;
+
+  // Flag that we want an update to occur in hook_drush_exit().
+  $_emacs_drush_update_tags = TRUE;
+}
+
+/**
+ * Implements hook_pm_post_update().
+ */
+function emacs_pm_post_update($release_name, $release_candidate_version, $project_parent_path = NULL) {
+  global $_emacs_drush_update_tags;
+
+  // Flag that we want an update to occur in hook_drush_exit().
+  $_emacs_drush_update_tags = TRUE;
+}
+
+/**
+ * Implements hook_drush_exit().
+ */
+function emacs_drush_exit() {
+  global $_emacs_drush_update_tags;
+
+  if (isset($_emacs_drush_update_tags) && $_emacs_drush_update_tags) {
+    if (drush_get_option('emacs-pm-post-download-etags', TRUE) && file_exists(drush_locate_root() . "/TAGS")) {
+      drush_emacs_etags();
+    }
+    if (drush_get_option('emacs-pm-post-download-gtags', TRUE) && file_exists(drush_locate_root() . "/GTAGS")) {
+      drush_emacs_gtags();
+    }
+
+    // Now we have updated the tags - so don't do it again (drush pm-update
+    // apparently calls hook_drush_exit() twice).
+    $_emacs_drush_update_tags = FALSE;
   }
 }

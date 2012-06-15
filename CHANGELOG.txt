@@ -1,0 +1,5 @@
+Changes since 7.x-1.0:
+
+-   Generate tags on pm-update as well and only once.
+-   Fixed minor issues in documentation.
+

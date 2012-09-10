@@ -91,7 +91,8 @@ function drush_emacs_gtags() {
 
   drush_log('Creating/updating GNU GLOBAL files...');
 
-  system(trim(implode(' ', $gtags_command)), $return);
+  $gtags_command = trim(implode(' ', $gtags_command));
+  system($gtags_command, $return);
 
   if ($return) {
     return drush_set_error('DRUSH_EMACS', dt('Problem executing "@command".', array('@command' => $gtags_command)));

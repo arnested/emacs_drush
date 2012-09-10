@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Various useful drush commands and extensions for Emacs users.
+ * Drush commands and extensions for Emacs users.
  */
 
 define('DRUSH_EMACS_ETAGS_EXTENSIONS', 'module,inc,php,profile,install');
@@ -22,8 +22,8 @@ function emacs_drush_command() {
     ),
     'options' => array(
       'emacs-etags-extensions' => dt('On which file extensions to run etags. Defaults to "@extensions".', array('@extensions' => DRUSH_EMACS_ETAGS_EXTENSIONS)),
-      'emacs-etags-etags-program' => dt('Name of the etags executable. Include path if it cannot be found in $PATH.'),
-      'emacs-etags-find-program' => dt('Name of the find executable. Include path if it cannot be found in $PATH.'),
+      'emacs-etags-etags-program' => dt('Name of the etags executable. Include path if executable is not in $PATH.'),
+      'emacs-etags-find-program' => dt('Name of the find executable. Include path if executable is not in $PATH.'),
     ),
   );
   $items['gtags'] = array(
@@ -33,7 +33,7 @@ function emacs_drush_command() {
       'drush gtags' => dt('Make/update GNU GLOBAL files in DRUPAL_ROOT.'),
     ),
     'options' => array(
-      'emacs-gtags-gtags-program' => dt('Name of the gtags executable. Include path if it cannot be found in $PATH.'),
+      'emacs-gtags-gtags-program' => dt('Name of the gtags executable. Include path if executable is not in $PATH.'),
       'emacs-gtags-gtags-options' => dt('Options to add to gtags. Defaults to none.'),
       'emacs-gtags-gtagsconf' => dt('Gtags configuration file to use. Defaults to "@gtagsconf". Use "0" for gtags default configuration.', array('@gtagsconf' => DRUSH_EMACS_GTAGS_GTAGSCONF)),
       'emacs-gtags-gtagslabel' => dt('Gtags label to use. Defaults to "drupalX" where X is your Drupal major version number. Use "0" for gtags default label.'),

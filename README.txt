@@ -1,5 +1,5 @@
-This project consists of a few Drush utilities for making the daily
-life of Emacs users easier.
+This project consists of Drush utilities for making the daily life of
+Emacs users easier.
 
 Currently the project provides two new Drush commands:
 
@@ -25,9 +25,9 @@ and you have to remember to do that from your `DRUPAL_ROOT`.
 With gtags there are other caveats. A default installation will
 recognize .php (and .php3 and .phtml) as PHP files but not .module
 etc. And due to some
-[bug/limitation](http://permalink.gmane.org/gmane.comp.gnu.global.bugs/1439)
-in gtags, gtags will fail on parsing modules/system/system.api.php in
-Drupal 7 (core/modules/system/system.api.php in Drupal 8).
+[limitation](http://comments.gmane.org/gmane.comp.gnu.global.bugs/1439)
+gtags will fail on parsing modules/system/system.api.php in Drupal 7
+(core/modules/system/system.api.php in Drupal 8).
 
 `drush gtags` will run gtags with a configuration suitable for
 generating tag files for Drupal (as well as skip
@@ -37,9 +37,9 @@ your `DRUPAL_ROOT`.
 
 ## I don't remember to update my tag files after installing new modules! ##
 
-That is why `drush etags/gtags` will hook into `drush pm-download`
-and run `drush etags` or `drush gtags` for you if you already have tag
-files in your `DRUPAL_ROOT`.
+That is why `drush etags/gtags` will hook into `drush pm-download` and
+`drush pm-update` and run `drush etags` or `drush gtags` for you if
+you already have tag files in your `DRUPAL_ROOT`.
 
 So just run `drush etags/gtags` once on your project and then `drush
 pm-download` will keep the tag files up to date after each download.
@@ -48,16 +48,14 @@ pm-download` will keep the tag files up to date after each download.
 ## Options for `drush etags` ##
 
 `--emacs-etags-etags-program`
-:   Name of the etags executable. Include path if it cannot be found in
-    $PATH.
+:   Name of the etags executable. Include path if executable is not in $PATH.
 
 `--emacs-etags-extensions`
 :   On which file extensions to run etags. Defaults to
     "module,inc,php,profile,install".
 
 `--emacs-etags-find-program`
-:   Name of the find executable. Include path if it cannot be found in
-    $PATH.
+:   Name of the find executable. Include path if executable is not in $PATH.
 
 ## Options for `drush gtags` ##
 
@@ -65,8 +63,7 @@ pm-download` will keep the tag files up to date after each download.
 :   Options to add to gtags. Defaults to none.                                                                                  
 
 `--emacs-gtags-gtags-program`
-:   Name of the gtags executable. Include path if it cannot be found in
-    $PATH.
+:   Name of the gtags executable. Include path if executable is not in $PATH.
 
 `--emacs-gtags-gtagsconf`
 :   Gtags configuration file to use. Defaults to
@@ -86,13 +83,9 @@ For `drush etags`:
 
 For `drush gtags`:
 
- * `gtags` - part of your GNU GLOBAL installation. I have tested successfully with version 6.2.
+ * `gtags` - part of your GNU GLOBAL installation. I have tested successfully with version 6.2.x.
 
-Although the release is named 7.x-1.x it will also work with Drupal 6
-and Drupal 8 - but I don't think there is a better way to name a
-release for a Drush project?
-
-Tested with Drush 5.3 and Drush 4.5.
+Tested with Drush 5.x and Drush 4.5.
 
 ## I think it's rude to run your script after drush pm-download!!§! ##
 
@@ -111,7 +104,15 @@ in your `drushrc.php` or to your `@my-site-alias` as:
       'emacs-pm-post-download-etags' => FALSE,
       'emacs-pm-post-download-gtags' => FALSE,
       ...
-    ),
+    );
+
+## Installation ##
+
+The releases 7.x-1.1 and 6.x-1.1 are identical. This will allow you to install this extension by issuing:
+
+    drush dl emacs_drush
+
+while located in a Drupal 7 project, a Drupal 6 project, or outside a Drupal project.
 
 ## Huh? This is not a drupal-mode for Emacs? ##
 

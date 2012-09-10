@@ -16,7 +16,7 @@ function emacs_drush_command() {
 
   $items['etags'] = array(
     'description' => dt('Make/update Emacs TAGS file.'),
-    'bootstrap' => DRUSH_BOOTSTRAP_DRUPAL_ROOT,
+    'bootstrap' => DRUSH_BOOTSTRAP_NONE,
     'examples' => array(
       'drush etags' => dt('Make/update an Emacs TAGS file in DRUPAL_ROOT.'),
     ),
@@ -28,7 +28,7 @@ function emacs_drush_command() {
   );
   $items['gtags'] = array(
     'description' => dt('Make/update GNU GLOBAL files.'),
-    'bootstrap' => DRUSH_BOOTSTRAP_DRUPAL_ROOT,
+    'bootstrap' => DRUSH_BOOTSTRAP_NONE,
     'examples' => array(
       'drush gtags' => dt('Make/update GNU GLOBAL files in DRUPAL_ROOT.'),
     ),
@@ -46,14 +46,25 @@ function emacs_drush_command() {
 /**
  * Make/update an Emacs TAGS file in DRUPAL_ROOT.
  */
-function drush_emacs_etags() {
+function drush_emacs_etags($root = NULL) {
+  if (is_null($root)) {
+    $root = drush_locate_root();
+  }
+
   $extensions = explode(',', drush_get_option('emacs-etags-extensions', DRUSH_EMACS_ETAGS_EXTENSIONS));
   $etags = drush_get_option('emacs-etags-etags-program', 'etags');
   $find = drush_get_option('emacs-etags-find-program', 'find');
 
   $etags_command = "$find . -type f -name \*." . implode(' -or -name \*.', $extensions) . " | $etags --language=php -";
 
-  chdir(drush_locate_root());
+  if ($root) {
+    chdir($root);
+  }
+  elseif (!file_exists('TAGS')) {
+    if (!drush_confirm('No DRUPAL_ROOT and no TAGS in current dir. Create TAGS in current dir?')) {
+      return drush_user_abort('User aborted.');
+    };
+  }
 
   drush_log('Creating/updating Emacs TAGS file...');
   system($etags_command, $return);
@@ -68,7 +79,11 @@ function drush_emacs_etags() {
 /**
  * Make/update GNU GLOBAL files in DRUPAL_ROOT.
  */
-function drush_emacs_gtags() {
+function drush_emacs_gtags($root = NULL) {
+  if (is_null($root)) {
+    $root = drush_locate_root();
+  }
+
   $gtags = drush_get_option('emacs-gtags-gtags-program', 'gtags');
   $options = drush_get_option('emacs-gtags-gtags-options', FALSE);
 
@@ -87,7 +102,18 @@ function drush_emacs_gtags() {
     $gtags_command[] = " $options";
   }
 
-  chdir(drush_locate_root());
+  if (is_null($root)) {
+    $root = drush_locate_root();
+  }
+
+  if ($root) {
+    chdir($root);
+  }
+  elseif (!file_exists('GTAGS')) {
+    if (!drush_confirm('No DRUPAL_ROOT and no GTAGS in current dir. Create GTAGS in current dir?')) {
+      return drush_user_abort('User aborted.');
+    };
+  }
 
   drush_log('Creating/updating GNU GLOBAL files...');
 
@@ -128,6 +154,28 @@ function emacs_drush_pm_post_download($project, $release) {
  */
 function emacs_pm_post_update($release_name, $release_candidate_version, $project_parent_path = NULL) {
   global $_emacs_drush_update_tags;
+
+  // Flag that we want an update to occur in hook_drush_exit().
+  $_emacs_drush_update_tags = TRUE;
+}
+
+/**
+ * Implements hook_situs_post_build().
+ *
+ * Support Situs site building command for Drush.
+ *
+ * @see https://github.com/xendk/situs
+ */
+function emacs_situs_post_build($build_path) {
+  global $_emacs_drush_update_tags;
+  $root = drush_get_option('root', '');
+
+  if (drush_get_option('emacs-pm-post-download-etags', TRUE) && file_exists($root . '/TAGS')) {
+    drush_emacs_etags($build_path);
+  }
+  if (drush_get_option('emacs-pm-post-download-gtags', TRUE) && file_exists($root . '/GTAGS')) {
+    drush_emacs_gtags($build_path);
+  }
 
   // Flag that we want an update to occur in hook_drush_exit().
   $_emacs_drush_update_tags = TRUE;

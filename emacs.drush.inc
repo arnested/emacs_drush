@@ -81,7 +81,7 @@ function drush_emacs_etags($root = NULL) {
  */
 function drush_emacs_gtags($root = NULL) {
   if (is_null($root)) {
-    $root = drush_locate_root();
+    $root = drush_get_context('DRUSH_SELECTED_DRUPAL_ROOT');
   }
 
   $gtags = drush_get_option('emacs-gtags-gtags-program', 'gtags');
@@ -103,7 +103,7 @@ function drush_emacs_gtags($root = NULL) {
   }
 
   if (is_null($root)) {
-    $root = drush_locate_root();
+    $root = drush_get_context('DRUSH_SELECTED_DRUPAL_ROOT');
   }
 
   if ($root) {
@@ -188,10 +188,10 @@ function emacs_drush_exit() {
   global $_emacs_drush_update_tags;
 
   if (isset($_emacs_drush_update_tags) && $_emacs_drush_update_tags) {
-    if (drush_get_option('emacs-pm-post-download-etags', TRUE) && file_exists(drush_locate_root() . "/TAGS")) {
+    if (drush_get_option('emacs-pm-post-download-etags', TRUE) && file_exists(drush_get_context('DRUSH_SELECTED_DRUPAL_ROOT') . "/TAGS")) {
       drush_emacs_etags();
     }
-    if (drush_get_option('emacs-pm-post-download-gtags', TRUE) && file_exists(drush_locate_root() . "/GTAGS")) {
+    if (drush_get_option('emacs-pm-post-download-gtags', TRUE) && file_exists(drush_get_context('DRUSH_SELECTED_DRUPAL_ROOT') . "/GTAGS")) {
       drush_emacs_gtags();
     }
 

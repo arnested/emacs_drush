@@ -175,15 +175,31 @@ function emacs_pm_post_update($release_name, $release_candidate_version, $projec
 }
 
 /**
- * Implements hook_situs_post_build().
+ * Implements hook_situs_hooks().
+ */
+function emacs_situs_plugin() {
+  return array(
+    'emacs' => array(
+      'name' => 'Emacs Drush',
+      'description' => 'Emacs Drush: Build etags/gtags after situs build.',
+      'post_build' => 'emacs_situs_post_build',
+    ),
+  );
+}
+
+/**
+ * Situs post_build. Build etags/gtags after situs build.
  *
  * Support Situs site building command for Drush.
  *
+ * @see emacs_situs_plugin()
  * @see https://github.com/xendk/situs
  */
-function emacs_situs_post_build($build_path) {
+function emacs_situs_post_build() {
   global $_emacs_drush_update_tags;
+
   $root = drush_get_option('root', '');
+  $build_path = drush_get_context('SITUS_BUILD_PATH');
 
   if (drush_get_option('emacs-pm-post-download-etags', TRUE) && file_exists($root . '/TAGS')) {
     drush_emacs_etags($build_path);

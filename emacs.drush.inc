@@ -8,6 +8,9 @@
 define('DRUSH_EMACS_ETAGS_EXTENSIONS', 'module,inc,php,profile,install');
 define('DRUSH_EMACS_GTAGS_GTAGSCONF', dirname(__FILE__) . '/globalrc');
 
+// The first version known to parse system.api.php without errors.
+define('DRUSH_EMACS_GTAGS_FIRST_GOOD_VERSION', '6.2.7');
+
 /**
  * Implements hook_drush_command().
  */
@@ -36,7 +39,7 @@ function emacs_drush_command() {
       'emacs-gtags-gtags-program' => dt('Name of the gtags executable. Include path if executable is not in $PATH.'),
       'emacs-gtags-gtags-options' => dt('Options to add to gtags. Defaults to none.'),
       'emacs-gtags-gtagsconf' => dt('Gtags configuration file to use. Defaults to "@gtagsconf". Use "0" for gtags default configuration.', array('@gtagsconf' => DRUSH_EMACS_GTAGS_GTAGSCONF)),
-      'emacs-gtags-gtagslabel' => dt('Gtags label to use. Defaults to "drupalX" where X is your Drupal major version number. Use "0" for gtags default label.'),
+      'emacs-gtags-gtagslabel' => dt('Gtags label to use. Defaults value depends on your version of GNU GLOBAL. From GNU GLOBAL version @gtagsversion it will default to "drupal". Older versions of GNU GLOBAL will default to "drupalX" where X is your Drupal major version number. Use "0" to indicate no label (gtags default label).', array('@gtagsversion' => DRUSH_EMACS_GTAGS_FIRST_GOOD_VERSION)),
     ),
   );
 
@@ -88,7 +91,19 @@ function drush_emacs_gtags($root = NULL) {
   $options = drush_get_option('emacs-gtags-gtags-options', FALSE);
 
   $gtagsconf = drush_get_option('emacs-gtags-gtagsconf', DRUSH_EMACS_GTAGS_GTAGSCONF);
-  $gtagslabel = drush_get_option('emacs-gtags-gtagslabel', 'drupal' . drush_drupal_major_version());
+
+  if (!drush_get_option('emacs-gtags-gtagslabel', FALSE) AND version_compare(_emacs_gtags_version(), DRUSH_EMACS_GTAGS_FIRST_GOOD_VERSION)) {
+    $gtagslabel = 'drupal' . drush_drupal_major_version();
+    if (drush_drupal_major_version() == 7) {
+      drush_log('Gtags skipping modules/system/system.api.php since your are using Drupal 7 and gtags version prior to ' . DRUSH_EMACS_GTAGS_FIRST_GOOD_VERSION, 'warning');
+    }
+    elseif (drush_drupal_major_version() >= 8) {
+      drush_log('Gtags skipping core/modules/system/system.api.php since your are using Drupal 8 and gtags version prior to ' . DRUSH_EMACS_GTAGS_FIRST_GOOD_VERSION, 'warning');
+    }
+  }
+  else {
+    $gtagslabel = drush_get_option('emacs-gtags-gtagslabel', 'drupal');
+  }
 
   $gtags_command = array();
   $gtags_command[] = $gtags;
@@ -199,4 +214,15 @@ function emacs_drush_exit() {
     // apparently calls hook_drush_exit() twice).
     $_emacs_drush_update_tags = FALSE;
   }
+}
+
+/**
+ * Gtags / GNU GLOBAL version number.
+ *
+ * @return string
+ *   Version number of gtags.
+ */
+function _emacs_gtags_version() {
+  $gtags = drush_get_option('emacs-gtags-gtags-program', 'gtags');
+  return trim(`$gtags --quiet --version`);
 }

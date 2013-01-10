@@ -51,7 +51,7 @@ function emacs_drush_command() {
  */
 function drush_emacs_etags($root = NULL) {
   if (is_null($root)) {
-    $root = drush_locate_root();
+    $root = drush_get_context('DRUSH_SELECTED_DRUPAL_ROOT');
   }
 
   $extensions = explode(',', drush_get_option('emacs-etags-extensions', DRUSH_EMACS_ETAGS_EXTENSIONS));
